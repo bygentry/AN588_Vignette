@@ -13,6 +13,7 @@ module:
 - use oneway ANOVA to determine significance of relationship
 
 # Purpose
+- guide user through data import and population data analysis using a multivariate linear regression and one-way ANOVA test
 # Introduction
 # Data Preparation
 # Stastical Analyses
