@@ -1,0 +1,8 @@
+---
+title: "Linear and Quadratic Discriminant Analysis"
+author: "Gentry Miller and Alexandra Walsh"
+format: html
+editor: visual
+---
+
+## Discriminant Function Analysis
