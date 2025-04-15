@@ -1,6 +1,7 @@
 # AN588_Vignette
 Shared repository for AN588 Stats Vignette Project
 ## Notes
+LDA is linear discriminate analysis. It is a type of analysis that is used to predict a data point based on other features. LDA works by calculating the means and covariance matrices for each data class. Linear discrimiante analysis utilized pattern recognition in order to predict a specific data point. LDA effectively reduces the amount of data dimensions.
 
 ## Challenge 1
 use linear discriminant analysis (LDA) to analyze the gibbon femur data and predict the sex of gibbons by species and femur length
