@@ -10,3 +10,8 @@ use DFA to predict the age class of gibbons based on their species and femur len
 
 ## Challenge 3
 use DFA to predict the family of a primate based on several data points from the Kamilar and Cooper data 
+predictors:
+- mean brain size
+- mean mass for males and females
+- mass dimorphism ratio
+- canine dimophism ratio
