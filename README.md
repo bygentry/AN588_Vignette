@@ -30,21 +30,21 @@ linear transformations are analyzed using eigenvectors and eigenvalues
 - eigenvalues denote the importance of the directional data
   - a high eigenvalue means the associated eigenvector is more critical
 
-### Implementing LDA
+## Implementing LDA
 To use LDA effectively, it's essential to prepare the dataset beforehand
-# 1. preprocess the data to ensure normality and centrality
+### 1. preprocess the data to ensure normality and centrality
   - this is achieved by passing the n-component parameter, which identifies the number of linear discriminants to retrieve
-# 2. Choose an appropriate number of dimensions for the lower-dimensional space
+### 2. Choose an appropriate number of dimensions for the lower-dimensional space
   - this is also achieved by passing the n-component paramter
-# 3. Regularize the model
+### 3. Regularize the model
   - regularization aims to prevent "overfitting", where the stat model fits exactly against its training data and undermines accuracy
     
-### Using LDA
-# 1. Calculate between-class variance
+## Using LDA
+### 1. Calculate between-class variance
   - the distance between class means
-# 2. Calculate within-class variance
+### 2. Calculate within-class variance
   - the distance between class means and samples
-# 3. Project data into lower-dimensional space
+### 3. Project data into lower-dimensional space
   - this maximizes the between-class variance and minimizes within-class variance. We can represent the lienar discriminant function for two classes mathematically with:
   - delta(x) = x * (sigma^2 * (mu_0 - mu_1) - 2 * sigma^2 * (mu_0^2 - mu_1^2) + ln(P(w_0)/P(w_1)))
   - where:
