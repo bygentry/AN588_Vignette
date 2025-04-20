@@ -1,15 +1,19 @@
 # AN588_Vignette
 Shared repository for AN588 Stats Vignette Project
 ## Notes
-LDA is linear discriminate analysis. It is a type of analysis that is used to predict a data point based on other features. LDA works by calculating the means and covariance matrices for each data class. Linear discrimiante analysis utilizes pattern recognition in order to predict a specific data point. LDA effectively reduces the amount of data dimensions.
+LDA is linear discriminate analysis. It is a type of analysis that is used to predict a data point based on other features. LDA works by calculating the means and covariance matrices for each data class. Linear discrimiante analysis utilizes pattern recognition in order to predict a specific data point. LDA effectively reduces the amount of data dimensions, making modeling more efficient. To successfuly compute the LDA in R, the following packages need to be be loaded:
+- library(MASS)
+- library(ggplot2)
+- library(caret) 
 
 To reduce dimensionality, LDA follows these criteria:
 - maximize the distance between the means of two classes
 - minimize the variance within individual classes
 
 ### Properties and Assumptions of LDA
-- LDAs operate by projecting a feature space (a data set of n dimensions)   onto a smaller space "k", where k <= n-1 without losing class information.
+- LDAs operate by projecting a feature space (a data set of n dimensions) onto a smaller space "k", where k <= n-1 without losing class information.
 - an LDA mdoel comprises the statistical properties that are calculated for the data in each class - where there are multiple variables, these properties are calculated over the multivariate Gaussian (normal) distribution
+  - the Gaussian distribution is a probability distribution that is symmetric about the mean, resulting in a "bell curve" shape
   
 - multivariates are:
   - means
