@@ -1,6 +1,9 @@
 # AN588_Vignette
 Shared repository for AN588 Stats Vignette Project
 ## Notes
+
+https://www.youtube.com/watch?v=azXCzI57Yfc&t=267s
+
 LDA is linear discriminate analysis. It is a type of analysis that is used to predict a data point based on other features. LDA works by calculating the means and covariance matrices for each data class. Linear discrimiante analysis utilizes pattern recognition in order to predict a specific data point. LDA effectively reduces the amount of data dimensions, making modeling more efficient. To successfuly compute the LDA in R, the following packages need to be be loaded:
 - library(MASS)
 - library(ggplot2)
