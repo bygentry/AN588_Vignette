@@ -19,6 +19,32 @@ editor: visual
 
 -   strapping: filter genus -\> mu = mean for each stat -\> rpois w/ n = 10000 and mu ??
 
+-   rework: challenge 1 -\> use simulated data to manually create a new axis (reduce dimensionality) with 2 variables
+
+    -   $\frac{(\mu_1 - \mu_2)^2}{s_1^2 + s_2^2}$
+
+    -   $d = \mu_1 - \mu_2$
+
+    -   $\frac{d^2}{s_1^2 + s_2^2}$
+
+    -   d = "distance" between means
+
+    -   by minimizing variation ("scatter", $s^2$) within each category, the denominator is reduced creating a larger ratio of distance over scatter
+
+-   challenge 2 -\> do the same with more than 2 variables
+
+    -   instead of measuring distance between means, find point central to all data (C)
+
+    -   measure disances between a point central to each category and the point C
+
+    -   maximize distance between each category and C while minimizing the scatter for each category
+
+    -   .$$\frac{d_1^2 + d_2^2 + ... +d_n^2}{s_1^2 + s_2^2 + ... + s_n^2}$$
+
+    -   
+
+-   challenge 3 -\> use lda function with Kamilar and Cooper data (if possible)
+
 ## Preliminaries
 
 ```{r}
@@ -92,9 +118,7 @@ Quadratic discriminant analysis is similar to LDA, but assumes that that each cl
 
 ### Getting Started
 
-The first step is to identify your predictor variables. Ideally, these are continuous variables that are normally distributed. In the Kamilar and Cooper data,
-
-Let's start by exploring our predictor variables by themselves. Using the Kamilar and Cooper data, we should start be cleaning up our data set. For our purposes, we need our data to not contain any `NA` values in the columns we want to use as predictors.
+Let's start by simulating some data. Linear Discriminant Analysis
 
 ```{r}
 str(d)
@@ -203,44 +227,3 @@ linear
 linear <- lda(Genus~., data = training)
 linear
 ```
-
-#### Quadratic Discirminant Anaysis
-
-First, we must set seed for reproducibility. 
-
-set.seed(482)
-
-Now, we nee to split the data into training and test. 
-
-We'll use 70% for training and 30% for testing. 
-
-train_index <- sample(1:nrow(tidy.data), 0.7 * nrow(tidy.data))
-train_data <- tidy.data[train_index, ]
-test_data <- tidy.data[-train_index, ]
-
-Now we will fit the model for all for features.
-
-qda_model <- qda(Species ~ ., data = train_data)
-
-To view the model:
-
-print(qda_model)
-
-We first want to make prediction, based on the test set. 
-
-qda_pred <- predict(qda_model, test_data)
-
-Next, display predicted classes.
-
-head(qda_pred$class)
-
-Create a confusion matrix and a print confusion matrix. 
-
-conf_matrix <- table(Predicted = qda_pred$class, Actual = test_data$Species)
-
-print(conf_matrix)
-
-Finally, check fo accuracy.
-
-accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix)
-cat("Accuracy:", round(accuracy * 100, 2), "%\n")
