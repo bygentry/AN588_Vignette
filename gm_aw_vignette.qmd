@@ -17,8 +17,6 @@ editor: visual
 
 -   box plots representing means by genera? 63 genera tho... example w/ single genus and instructions for how it could be done with all the other genera
 
--   
-
 -   strapping: filter genus -\> mu = mean for each stat -\> rpois w/ n = 10000 and mu ??
 
 ## Preliminaries
@@ -94,9 +92,9 @@ Quadratic discriminant analysis is similar to LDA, but assumes that that each cl
 
 ### Getting Started
 
-Let's start by exploring our predictor variables by themselves. Using the Kamilar and Cooper data, we should start be cleaning up our data set:
+The first step is to identify your predictor variables. Ideally, these are continuous variables that are normally distributed. In the Kamilar and Cooper data,
 
-For our purposes, we need our data to not contain any `NA` values in the columns we want to use as predictors.
+Let's start by exploring our predictor variables by themselves. Using the Kamilar and Cooper data, we should start be cleaning up our data set. For our purposes, we need our data to not contain any `NA` values in the columns we want to use as predictors.
 
 ```{r}
 str(d)
@@ -140,7 +138,7 @@ Looks like 42 rows among those columns had `NA` values. Let's verify that we're 
 #| label: Cleaning Our Data III
 
 # iterates over each row in tidy.data columns 5, 8, 9, and 10 and if an NA is found, prints the index of that NA
-for(i in nrow(tidy.data)){
+for(i in 1:nrow(tidy.data)){
   for(j in c(5, 8, 9, 10))
     if(is.na(tidy.data[i, j])){
       print(paste0("NA at ", i,", ", j))
