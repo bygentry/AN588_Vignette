@@ -23,12 +23,26 @@ repos = "http://cran.us.r-project.org"
 if(!require("tidyverse")){ install.packages("tidyverse", repos = repos) } 
 if(!require("MASS")){ install.packages("MASS", repos = repos) }
 if(!require("ggplot2")){ install.packages("ggplot2", repos = repos) }
-if(!require("caret")){ install.packages("caret", repos = repos) }
+if(!require("klaR")){ install.packages("klar", repos = repos) }
+if(!require("curl")){ install.packages("curl", repos = repos) }
+if(!require("psych")){ install.packages("psych", repos = repos) }
 
 library(tidyverse)
 library(MASS)
 library(ggplot2)
-library(caret)
+library(klaR)
+library(curl)
+library(psych)
+```
+
+```{r}
+#| label: Loading Data
+
+# store data from gibbon-femurs.csv in holder f
+f <- curl("https://raw.githubusercontent.com/bygentry/AN588_Vignette/refs/heads/main/KamilarAndCooperData.csv")
+
+# convert data in f to a data frame and store in holder d
+d <- read.csv(f, sep = ",", stringsAsFactors = TRUE)
 ```
 
 ## Introduction
@@ -37,7 +51,7 @@ library(caret)
 
 Discriminant analysis is a type of statistical analysis used to predict the probability of belonging to a given class or category based on one or more predictor variables. We will be covering two different types of discriminant analyses: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
 
-Linear discriminant analysis is used to predict a data point based on other features. LDA is used to find a linear combination of features that separates different classes in a data set, while reducing the amount of dimensions. LDA works by calculating the means and covariance matrices for each data class, assuming a common covarience matrix between all classes. Essentailly, LDA, when effectively utilized, separates multiple classes with multiple features through data dimensionality reduction.
+Linear discriminant analysis is used to predict a data point based on other features. LDA is used to find a linear combination of features that separates different classes in a data set, while reducing the amount of dimensions. LDA works by calculating the means and covariance matrices for each data class, assuming a common covarience matrix between all classes. Essentailly, LDA, when effectively utilized, finds the linear combination of variables that provide the best possible separation between the groups.
 
 Quadratic discriminant analysis (QDA) is similar to LDA, but assumes that that each class has its own unique covariance matrix. QDA can be thought of as an extension to LDA, as it is still classifying observations from a set of predictor variables. Since each class has its own, unique covariance matrix, QDA allows for complex, non-linear modeling.
 
@@ -69,3 +83,76 @@ Quadratic discriminant analysis (QDA) is similar to LDA, but assumes that that e
     -   A high eigenvalue means the associated eigenvector is more critical
 
 ## Implementing Discriminant Analysis
+
+### Getting Started
+
+Let's start by exploring our predictor variables by themselves. Using the Kamilar and Cooper data, we should start be cleaning up our data set:
+
+For our purposes, we need our data to not contain any `NA` values in the columns we want to use as predictors.
+
+```{r}
+str(d)
+```
+
+So, we see that our data have 213 observations of 44 variables, but we're only going to use 4 of those variables in our analysis:
+
+```{r}
+colnames(d[ , c(5, 8:10)])
+```
+
+Using these four statistics, we can use LDA to make predictions about classifying these primates by species.
+
+#### Cleaning Our Data
+
+First, let's create a new `data.frame` to hold our clean data. Then, we can clean it up.
+
+```{r}
+#| label: Cleaning Our Data I
+
+# creates a new data.frame "tidy.data" as a copy of "d"
+tidy.data <- d
+
+# using the str() command we can see that Brain_Size_Species_Mean has at least one NA value
+str(tidy.data[5])
+tidy.data[2, 5]
+```
+
+We can check the other columns in the same way and see that all of them contain `NA` values somewhere. Luckily, the base R package `{stats}` comes with some functions that makes removing these easy - we'll be using `complete.cases()`:
+
+```{r}
+#| label: Cleaning Our Data II
+
+tidy.data <- tidy.data[complete.cases(tidy.data[ , c(5, 8:10)]), ]
+str(tidy.data)
+```
+
+Looks like 42 rows among those columns had `NA` values. Let's verify that we're `NA` free now.
+
+```{r}
+#| label: Cleaning Our Data III
+
+# iterates over each row in tidy.data columns 5, 8, 9, and 10 and if an NA is found, prints the index of that NA
+for(i in nrow(tidy.data)){
+  for(j in c(5, 8, 9, 10))
+    if(is.na(tidy.data[i, j])){
+      print(paste0("NA at ", i,", ", j))
+  }
+}
+```
+
+Cool, we're `NA` free. Thankfully, there is a much more succinct way to do this from the start:
+
+```{r}
+#| label: Cleaning Our Data IV
+
+tidy.data <- d[complete.cases(d[ , c(5, 8:10)]), ]
+```
+
+#### Exploring Our Data
+
+```{r}
+pairs.panels(tidy.data[5, 8:10],
+             gap = 0,
+             bg = c("red", "green", "blue", "purple")[d$Species],
+             pch = 21)
+```
