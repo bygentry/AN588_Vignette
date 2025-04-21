@@ -150,9 +150,17 @@ tidy.data <- d[complete.cases(d[ , c(5, 8:10)]), ]
 
 #### Exploring Our Data
 
+Let's see how our variables relate to each other. Using `pairs.panels()` , we can produce a plot that shows us a scatter diagram of each variable in relation to each other, a histogram showing the distribution of values for each variable, and the associated correlation value for each scatter plot.
+
 ```{r}
-pairs.panels(tidy.data[5, 8:10],
-             gap = 0,
-             bg = c("red", "green", "blue", "purple")[d$Species],
-             pch = 21)
+pairs.panels(tidy.data[, c(5, 8:10)],
+             gap = 1,
+             bg = (colorRampPalette(c("blue", "red"))(161)[d$Species]),
+             pch = 21,
+             hist.col = "lightpink",
+             hist.border = "white")
 ```
+
+This can be intimidating at first sight, but it's not as crazy as it might seem. Here it is again with the associated scatter plots and correlation values paired.
+
+![](https://github.com/bygentry/AN588_Vignette/blob/main/Images/plot_matrix.png)
