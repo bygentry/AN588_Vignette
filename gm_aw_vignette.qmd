@@ -5,11 +5,37 @@ format: html
 editor: visual
 ---
 
+## working notes - will be deleted 
+
+-   see equation 20.2 in book of R
+
+-   linear regression: predicting value of response var y based on observed relationship with predictor variable x. used to construct linear models of a relationship between x and y
+
+-   residual: difference of actual and predicted values in response variable
+
+## Preliminaries
+
+```{r}
+#| label: Loading Packages
+
+repos = "http://cran.us.r-project.org"
+
+if(!require("tidyverse")){ install.packages("tidyverse", repos = repos) } 
+if(!require("MASS")){ install.packages("MASS", repos = repos) }
+if(!require("ggplot2")){ install.packages("ggplot2", repos = repos) }
+if(!require("caret")){ install.packages("caret", repos = repos) }
+
+library(tidyverse)
+library(MASS)
+library(ggplot2)
+library(caret)
+```
+
 ## Introduction
 
 ### What is Discriminant Analysis? 
 
-Discriminant analysis is a type of statistical analysis that aims to classify data into different groups based on predictor variables. We will be covering two different types of discriminant analyses: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
+Discriminant analysis is a type of statistical analysis used to predict the probability of belonging to a given class or category based on one or more predictor variables. We will be covering two different types of discriminant analyses: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
 
 Linear discriminant analysis is used to predict a data point based on other features. LDA is used to find a linear combination of features that separates different classes in a data set, while reducing the amount of dimensions. LDA works by calculating the means and covariance matrices for each data class, assuming a common covarience matrix between all classes. Essentailly, LDA, when effectively utilized, separates multiple classes with multiple features through data dimensionality reduction.
 
