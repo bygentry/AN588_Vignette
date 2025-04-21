@@ -13,6 +13,14 @@ editor: visual
 
 -   residual: difference of actual and predicted values in response variable
 
+-   bootstrap data to make predictions while representing all genus levels in training set for LDA? normal? outliers?
+
+-   box plots representing means by genera? 63 genera tho... example w/ single genus and instructions for how it could be done with all the other genera
+
+-   
+
+-   strapping: filter genus -\> mu = mean for each stat -\> rpois w/ n = 10000 and mu ??
+
 ## Preliminaries
 
 ```{r}
@@ -51,9 +59,9 @@ d <- read.csv(f, sep = ",", stringsAsFactors = TRUE)
 
 Discriminant analysis is a type of statistical analysis used to predict the probability of belonging to a given class or category based on one or more predictor variables. We will be covering two different types of discriminant analyses: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
 
-Linear discriminant analysis is used to predict a data point based on other features. LDA is used to find a linear combination of features that separates different classes in a data set, while reducing the amount of dimensions. LDA works by calculating the means and covariance matrices for each data class, assuming a common covarience matrix between all classes. Essentailly, LDA, when effectively utilized, finds the linear combination of variables that provide the best possible separation between the groups.
+Linear discriminant analysis is used to find a linear combination of features that separates different classes in a data set. LDA works by calculating the means and covariance matrices for each data class, assuming a common covarience matrix between all classes. When effectively utilized, LDA finds the linear combination of variables that provide the best possible separation between the groups.
 
-Quadratic discriminant analysis (QDA) is similar to LDA, but assumes that that each class has its own unique covariance matrix. QDA can be thought of as an extension to LDA, as it is still classifying observations from a set of predictor variables. Since each class has its own, unique covariance matrix, QDA allows for complex, non-linear modeling.
+Quadratic discriminant analysis is similar to LDA, but assumes that that each class has its own unique covariance matrix. QDA can be thought of as an extension to LDA, as it is still classifying observations from a set of predictor variables. Since each class has its own, unique covariance matrix, QDA allows for complex, non-linear modeling.
 
 #### Properties and Assumptions of LDA
 
@@ -157,7 +165,7 @@ Let's see how our variables relate to each other. Using `pairs.panels()` , we ca
 
 pairs.panels(tidy.data[, c(5, 8:10)],
              gap = 1,
-             bg = (colorRampPalette(c("blue", "red"))(161)[d$Species]),
+             bg = (colorRampPalette(c("blue", "red"))(161)[tidy.data$Genus]),
              pch = 21,
              hist.col = "lightpink",
              hist.border = "white")
@@ -171,7 +179,9 @@ Based on these plots, it looks like brain size is strongly correlated with both 
 
 #### Data Partitioning
 
-In order to predict the species of a primate based on these variables, we'll need to create a training data set through random sampling. We'll use 66% of the set for training and the other 34% for testing:
+In order to predict the species of a primate based on these variables, we'll need to create a training data set through random sampling. Linear Discriminant Analysis requires at least one data point for each class in the training set, so let's bootstrap
+
+We'll use 66% of the set for training and the other 34% for testing:
 
 ```{r}
 #| label: Data Partitioning I
@@ -184,6 +194,14 @@ ind <- sample(2, nrow(tidy.data),
 
 training <- tidy.data[ind == 1, ]
 testing <- tidy.data[ind == 2, ]
+
+linear <- lda(Genus~., data = training)
+linear
 ```
 
 ### Linear Discriminant Analysis
+
+```{r}
+linear <- lda(Genus~., data = training)
+linear
+```
