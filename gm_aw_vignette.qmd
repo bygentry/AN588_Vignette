@@ -6,3 +6,35 @@ editor: visual
 ---
 
 ## Discriminant Function Analysis
+
+Introduction
+## What is Discriminant Analysis?
+- Discriminant analysis is a type of statistical analysis that aims to classify data into different groups based on predictor variables. We will be covering two different types of discriminant analyses: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA). Linear discriminant analysis is used to predict a data point based on other features. LDA is used to find a linear combination of features that separates different classes in a data set, while reducing the amount of dimensions. LDA works by calculating the means and covariance matrices for each data class, assuming a common covarience matrix between all classes. Essentailly, LDA, when effectively utilized, separates multiple classes with multiple features through data dimensionality reduction. Quadratic discriminant analysis (QDA) is similar to LDA, but assumes that that each class has its own unique covariance matrix. QDA can be thought of as an extension to LDA, as it is still classifying observations from a set of predictor variables. Since each class has its own, unique covariance matrix, QDA allows for complex, non-linear modeling. 
+
+## Properties and Assumptions of LDA
+- LDAs operate by projecting a feature space (a data set of n dimensions) onto a smaller space "k", where k <= n-1 without losing class information.
+
+- An LDA model comprises the statistical properties that are calculated for the data in each class - where there are multiple variables, these properties are calculated over the multivariate Gaussian (normal) distribution
+  -the Gaussian distribution is a probability distribution that is symmetric about the mean, resulting in a "bell curve" shape
+  multivariates are:
+  
+## Means
+- Covariance matrix (measures how each variable or feature relates to others within the same class)
+the model assumes the following:
+
+1.) the input dataset has a normal distribution
+
+2.) the dataset is linearly separable, meaning LDA can draw a decision boundary that separates the data points
+
+3.) each class has the same covariance matrix
+
+- These assumptions carry the limitation that LDA may not perform well in high-dimensional feature spaces
+
+## Linear transformations are analyzed using eigenvectors and eigenvalues
+
+- Eigenvectors provide the "direction" within the scatterplot
+- During dimensionality reduction, the eigenvectors are calculated from the data set and collected in two scatter-matrices:
+  - between-class scatter matrix representing info about the spread within each class
+  - within-class scatter matrix representing how classes are spread between themselves
+- Eigenvalues denote the importance of the directional data
+  - A high eigenvalue means the associated eigenvector is more critical
