@@ -392,7 +392,6 @@ fig <- plot_ly(data = lda_data,
          scene = list(xaxis = list(title = 'LD1'),
                       yaxis = list(title = 'LD2')))
 fig
-
 ```
 
 ### Challenge 3 - Quadratic Discriminant Analysis
