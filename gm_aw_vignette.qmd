@@ -10,7 +10,7 @@ editor: visual
 ### Packages
 
 ```{r}
-#| label: Installing Packages
+#| label: Packages
 
 library(klaR)
 library(curl)
@@ -18,7 +18,7 @@ library(psych)
 library(tidyverse)
 library(MASS)
 library(ggplot2)
-library(plot_ly)
+library(plotly)
 library(geometry)
 ```
 
@@ -26,11 +26,9 @@ library(geometry)
 
 ### What is Discriminant Analysis?
 
-Discriminant analysis is a type of statistical analysis used to predict the probability of belonging to a given class or category based on one or more predictor variables. We will be covering two different types of discriminant analyses: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
+Discriminant analysis is a type of statistical analysis used to predict the probability of belonging to a given class or category based on one or more predictor variables. We will be covering two different types of discriminant analysis: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
 
 Linear discriminant analysis is used to find a linear combination of features that separates different classes in a data set. LDA works by calculating the means and covariance matrices for each data class, assuming a common covariance matrix between all classes. When effectively utilized, LDA finds the linear combination of variables that provide the best possible separation between the groups.
-
-Quadratic discriminant analysis is similar to LDA, but assumes that that each class has its own unique covariance matrix. QDA can be thought of as an extension to LDA, as it is still classifying observations from a set of predictor variables. Since each class has its own, unique covariance matrix, QDA allows for complex, non-linear modeling.
 
 #### Properties and Assumptions of LDA
 
@@ -120,6 +118,7 @@ For an example where we only consider two classes, lets start by calculating the
 
 ```{r}
 #| label: Calculating Means
+
 mu1 <- colMeans(lda_data[lda_data$class == "A", 1:2])
 mu2 <- colMeans(lda_data[lda_data$class == "B", 1:2])
 ```
@@ -166,6 +165,8 @@ b <- -0.5 * t(mu1 + mu2) %*% cov_inv %*% d
 Let's plot this boundary and see where the best place to split the classes is
 
 ```{r}
+#| label: Visualizing Linear Boundary
+
 # Filter out class C data
 lda_data_xy <- lda_data[lda_data$class != "C", ]
 
@@ -193,7 +194,7 @@ w_unit <- w/sqrt(sum(w^2))
 Now, center the data about the mean
 
 ```{r}
-#| label: Centering 
+#| label: Centering Classes
 
 X <- as.matrix(lda_data_xy[, c("gene_x", "gene_y")])
 
@@ -205,6 +206,7 @@ and finally, project the data onto the discriminant axis.
 
 ```{r}
 #| label: Creating LDA Axis
+
 # Projection of each point onto the LDA axis
 lda_proj <- X_centered %*% w_unit
 
@@ -214,6 +216,8 @@ lda_data_xy$lda_proj <- as.vector(lda_proj)
 Now let's see this in context
 
 ```{r}
+#| label: Visualizing the Discriminant Axis
+
 proj_coords <- X_centered %*% w_unit %*% t(w_unit)
 
 global_mean <- colMeans(X)
@@ -243,6 +247,8 @@ ggplot() +
 And finally, let's see both the boundary and discriminant axis together
 
 ```{r}
+#| label: Visualizing Boundary and Discriminant Together
+
 ggplot() +
   geom_point(data = lda_data_xy, aes(x = gene_x, y = gene_y, color = class), alpha = 0.6, size = 2) +
   geom_point(data = proj_df, aes(x = gene_x_proj, y = gene_y_proj, color = class), shape = 4, size = 2.5) +
@@ -345,7 +351,7 @@ ggplot(lda_data, aes(x = LD1, y = LD2, color = class)) +
 Here, the line is squiggly because it represents a planar version of the LDA boundary. It might be easier to see here:
 
 ```{r}
-library(plotly)
+#| label: 3D Modeling of Multi-Class LDA
 
 # Create a 3D scatter plot with LD1, LD2, and LD3
 fig <- plot_ly(data = lda_data, 
@@ -364,6 +370,8 @@ fig
 ```
 
 ## Challenge 3 - Quadratic Discriminant Analysis
+
+Quadratic discriminant analysis is similar to LDA, but assumes that that each class has its own unique covariance matrix. QDA can be thought of as an extension to LDA, as it is still classifying observations from a set of predictor variables. Since each class has its own, unique covariance matrix, QDA allows for complex, non-linear modeling.
 
 ### Loading Data
 
