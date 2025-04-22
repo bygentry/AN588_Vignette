@@ -406,7 +406,9 @@ set.seed(482)
 Now, we nee to split the data into training and test. We'll use 70% for training and 30% for testing.
 
 ```{r}
-train_index <- sample(1:nrow(tidy.data), 0.7 * nrow(tidy.data)) train_data <- tidy.data[train_index, ] test_data <- tidy.data[-train_index, ]
+train_index <- sample(1:nrow(tidy.data), 0.7 * nrow(tidy.data)) 
+train_data <- tidy.data[train_index, ] 
+test_data <- tidy.data[-train_index, ]
 ```
 
 Now we will fit the model for all for features.
@@ -442,11 +444,13 @@ confusion matrix can be made as a table, to compare the positives and negatives 
 A print confusion matrix refers to the act of generating the confusion matrix table.
 
 ```{r}
-conf_matrix <- table(Predicted = qda_pred$class, Actual = test_data$Species)print(conf_matrix)
+conf_matrix <- table(Predicted = qda_pred$class, Actual = test_data$Species)
+print(conf_matrix)
 ```
 
 Finally, check for accuracy.
 
 ```{r}
-accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix) cat("Accuracy:", round(accuracy * 100, 2), "%\n")
+accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix) 
+cat("Accuracy:", round(accuracy * 100, 2), "%\n")
 ```
