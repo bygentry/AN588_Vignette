@@ -28,7 +28,11 @@ library(geometry)
 
 Discriminant analysis is a type of statistical analysis used to predict the probability of belonging to a given class or category based on one or more predictor variables. We will be covering two different types of discriminant analysis: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
 
-Linear discriminant analysis is used to find a linear combination of features that separates different classes in a data set. LDA works by calculating the means and covariance matrices for each data class, assuming a common covariance matrix between all classes. When effectively utilized, LDA finds the linear combination of variables that provide the best possible separation between the groups.
+## Implementing Discriminant Analysis
+
+### Linear Discriminant Analysis
+
+Linear discriminant analysis (LDA) is used to find a linear combination of features that separates different classes in a data set. LDA works by calculating the means and covariance matrices for each data class, assuming a common covariance matrix between all classes. When effectively utilized, LDA finds the linear combination of variables that provide the best possible separation between the groups.
 
 #### Properties and Assumptions of LDA
 
@@ -44,22 +48,11 @@ Linear discriminant analysis is used to find a linear combination of features th
 
     -   **Note:** These assumptions carry the limitation that LDA may not perform well in very high-dimensional feature spaces
 
-<!-- -->
-
 -   A covariance matrix that measures how each variable or feature relates to others within the same class.
 
-#### Linear transformations are analyzed using Eigenvectors and Eigenvalues
+#### Covariance Matrix
 
--   Eigenvectors provide the "direction" within the scatter plot
--   During dimensionality reduction, the eigenvectors are calculated from the data set and collected in two scatter-matrices:
-    -   between-class scatter matrix representing info about the spread within each class
-    -   within-class scatter matrix representing how classes are spread between themselves
--   Eigenvalues denote the importance of the directional data
-    -   A high eigenvalue means the associated eigenvector is more critical
-
-## Implementing Discriminant Analysis
-
-### Getting Started
+The covariance matrix
 
 Let's start by simulating some data. Linear Discriminant Analysis works best with normal, continuous variables with low colinearity. Considering this, let's imagine a study where a geneticist wants to classify a monkey into one of three genotypes based on the number of transcriptions of certain genes:
 
@@ -85,8 +78,9 @@ geno <- sample(c(0, 1, 2), size = n, replace = TRUE)
 gene_x <- rnorm(n, mean = 5 - (2 * geno), sd = 1) 
 # this will produce a distribution that is higher in genotype B individuals
 gene_y <- rnorm(n, mean = 5 + (2 * geno), sd = 1)
-# this will produce a distribution that has higher genotype A frequency
+# this will produce a distribution that is higher in genotype A individuals
 gene_z <- rnorm(n, mean = 5 + (2 * (geno == 2)), sd = 1)
+# this will produce a distribution that is higher in genotype C individuals
 
 # Now, let's store this simulated data
 lda_data <- data.frame(
@@ -105,7 +99,7 @@ head(lda_data)
 Linear discriminant analysis reduces the number of dimensions by creating a new axis while simultaneously considering two criteria:
 
 1.  On the new axis, we want to **maximize** the distance between the means of each variable
-2.  On the new axis, we want to **minimize** the spread ( $s^2$ )in each class
+2.  On the new axis, we want to **minimize** the spread ($s^2$)in each class
 
 We can accomplish this by expressing the rate:
 
@@ -113,7 +107,7 @@ $$
 \frac{(\mu_1 - \mu_2)^2}{s^2_1 + s^2_2}
 $$
 
-For an example where we only consider two classes, lets start by calculating the values we need. The means are easy, but we have to make sure to distinguish between genotype AND gene.
+For an example where we only consider two classes, lets start by calculating the values we need. The means are easy, but we have to make sure to distinguish between genotype [**and**]{.underline} gene.
 
 ```{r}
 #| label: Calculating Means
@@ -122,7 +116,7 @@ mu1 <- colMeans(lda_data[lda_data$geno == "A", 1:2])
 mu2 <- colMeans(lda_data[lda_data$geno == "B", 1:2])
 ```
 
-Things get a little tricky when it comes to spread. Because LDA assumes that the data all share the same covariance matrix (a.k.a pooled covariance matrix), we can't just use the standard deviations of the raw data. The covariance matrix is computed internally by lda(), but it can be computed manually like this:
+Things get a little tricky when it comes to spread. Because LDA assumes that the data all share the same covariance matrix (a.k.a pooled covariance matrix), we can't just use the standard deviations of the raw data. The covariance matrix is computed internally by `lda()`, but it can be computed manually like this:
 
 ```{r}
 #| label: Pooling Covariance
@@ -144,7 +138,8 @@ Division doesn't work well with matrices, so to calculate the Eigen values that 
 cov_inv <- solve(cov_pooled)
 ```
 
-and use matrix multiplication, $\%*\%$, to multiply the inverse matrix, $I[M]$, by the difference between the two means, a.k.a. the distance between the classes. This is effectively an expression of $$\frac{(\mu_1 - \mu_2)^2}{s^2_1 + s^2_2}, \quad d = \mu_1 - \mu_2 \\
+and use matrix multiplication, $\%*\%$, to multiply the inverse matrix, $I[M]$, by the difference between the two means, a.k.a. the distance between the classes. This is effectively an expression of $$ d = \mu_1 - \mu_2 \text{, so}\\
+\frac{(\mu_1 - \mu_2)^2}{s^2_1 + s^2_2} = \frac{d^2}{s^2_1 + s^2_2}
 $$
 
 using $I[M]$ instead of the sum of spreads to calculate the "weights" (w) represented by the Eigen values and:
@@ -265,9 +260,11 @@ And we can see that the boundary line that divides the group is perpendicular to
 
 ## Challenge 2 - LDA with More than 2 Categories
 
-So you might be wondering, if $d$ is the difference between the means, how do we use this formula with more than 2 categories? We can't just use the distance between any two.
+So you might be wondering, if $d$ is the difference between the means of each category, how do we use this formula with more than 2 categories? We can't just use the distance between any two.
 
-Well, we use a **central point** (C) that is equidistant from the mean of each class. So instead of maximizing the distance between classes, we try to maximize the distance of each class from C while still minimizing the scatter within each category. So instead of
+Well, we use a **central point** (C) that is equidistant from the mean of each class. So instead of maximizing the distance between classes, we try to maximize the distance of each class from C while still minimizing the scatter within each category.
+
+Instead of
 
 $$
 \frac{(d)^2}{s^2_1 + s^2_2}
@@ -327,13 +324,13 @@ Now, let's visualize this
 grid <- expand.grid(LD1 = seq(min(lda_data$LD1) - 1, max(lda_data$LD1) + 1, length.out = 100),
                     LD2 = seq(min(lda_data$LD2) - 1, max(lda_data$LD2) + 1, length.out = 100))
 
-grid$gene_x <- (grid$LD1)  # Placeholder for gene_x, gene_y, gene_z transformation if needed
+grid$gene_x <- (grid$LD1)  # Placeholder for gene_x, gene_y, gene_z transformation
 grid$gene_y <- (grid$LD2)  # Same for gene_y
-grid$gene_z <- 1  # If you want to include gene_z as a constant, modify as necessary.
+grid$gene_z <- outer(grid$LD1, grid$LD2, function(x, y) ( (-.lda * x - OPS.lda * y) / tSho.lda + 13.82201)) # If you want to include gene_z as a constant, modify as necessary.
 
 
 # Predict the class for each point in the grid
-grid$pred_geno <- predict(lda_model, newdata = grid)$geno
+grid$pred_geno <- predict(lda_model, newdata = grid)$class
 
 # Plot with decision boundary
 ggplot(lda_data, aes(x = LD1, y = LD2, color = geno)) +
@@ -341,8 +338,7 @@ ggplot(lda_data, aes(x = LD1, y = LD2, color = geno)) +
     labs(title = "2D LDA Projection with Decision Boundary",
        x = "Linear Discriminant 1 (LD1)",
        y = "Linear Discriminant 2 (LD2)") +
-  geom_contour(data = grid, aes(x = LD1, y = LD2, z = as.numeric(pred_geno)),
-               color = "black", bins = 1) +  
+  geom_contour(data = grid, aes(x = LD1, y = LD2, z = as.numeric(pred_geno)), color = "black", bins = 1) +
   coord_fixed() +
   theme_bw()
 ```
@@ -352,20 +348,23 @@ Here, the line is squiggly because it represents a planar version of the LDA bou
 ```{r}
 #| label: 3D Modeling of Multi-Class LDA
 
+groupmean<-(lda_model$prior%*%lda_model$means)
+constant<-(groupmean%*%lda_model$scaling)
+-constant
+
 # Create a 3D scatter plot with LD1, LD2, and LD3
 fig <- plot_ly(data = lda_data, 
-               x = ~LD1, 
-               y = ~LD2, 
-               z = ~gene_z, 
-               color = ~geno, 
-               type = 'scatter3d', 
-               mode = 'markers', 
-               marker = list(size = 5)) %>%
-  layout(title = "3D LDA Projection (LD1, LD2, LD3)",
-         scene = list(xaxis = list(title = 'LD1'),
-                      yaxis = list(title = 'LD2')))
-fig
-
+                x = ~LD1, 
+                y = ~LD2, 
+                z = ~gene_z, 
+                color = ~geno, 
+                type = 'scatter3d', 
+                mode = 'markers', 
+                marker = list(size = 5)) %>%
+   layout(title = "3D LDA Projection (LD1, LD2, LD3)",
+          scene = list(xaxis = list(title = 'LD1'),
+                       yaxis = list(title = 'LD2')))
+ fig
 ```
 
 ## Challenge 3 - Quadratic Discriminant Analysis
