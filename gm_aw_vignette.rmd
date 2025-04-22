@@ -374,7 +374,7 @@ ggplot(lda_data, aes(x = LD1, y = LD2, color = class)) +
   theme_bw()
 ```
 
-Here, the line is squiggly because it represents a plane of separation from the higher dimensional space being projected onto a 2D graph. It might be easier to see here:
+Here, the line is squiggly because it represents a planar version of the LDA boundary. It might be easier to see here:
 
 ```{r}
 library(plotly)
