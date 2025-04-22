@@ -278,7 +278,7 @@ A print confusion matrix refers to the act of generating the confusion matrix ta
 conf_matrix <- table(Predicted = qda_pred$class, Actual = test_data$Species)print(conf_matrix)
 ```
 
-Finally, check fo accuracy.
+Finally, check for accuracy.
 
 ```{r}
 accuracy <- sum(diag(conf_matrix)) / sum(conf_matrix) cat("Accuracy:", round(accuracy * 100, 2), "%\n")
