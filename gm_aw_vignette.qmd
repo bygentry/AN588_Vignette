@@ -5,42 +5,6 @@ format: html
 editor: visual
 ---
 
-## working notes - will be deleted
-
--   module7
-
--   bootstrap data to make predictions while representing all genus levels in training set for LDA? normal? outliers?
-
--   box plots representing means by genera? 63 genera tho... example w/ single genus and instructions for how it could be done with all the other genera
-
--   strapping: filter genus -\> mu = mean for each stat -\> rpois w/ n = 10000 and mu ??
-
--   rework: challenge 1 -\> use simulated data to manually create a new axis (reduce dimensionality) with 2 variables
-
-    -   $\frac{(\mu_1 - \mu_2)^2}{s_1^2 + s_2^2}$
-
-    -   $d = \mu_1 - \mu_2$
-
-    -   $\frac{d^2}{s_1^2 + s_2^2}$
-
-    -   d = "distance" between means
-
-    -   by minimizing variation ("scatter", $s^2$) within each category, the denominator is reduced creating a larger ratio of distance over scatter
-
--   challenge 2 -\> do the same with more than 2 variables
-
-    -   instead of measuring distance between means, find point central to all data (C)
-
-    -   measure disances between a point central to each category and the point C
-
-    -   maximize distance between each category and C while minimizing the scatter for each category
-
-    -   .$$\frac{d_1^2 + d_2^2 + ... +d_n^2}{s_1^2 + s_2^2 + ... + s_n^2}$$
-
-    -   
-
--   challenge 3 -\> use lda function with Kamilar and Cooper data (if possible)
-
 ## Preliminaries
 
 ### Packages
@@ -96,7 +60,7 @@ tidy.data <- d[complete.cases(d[ , c(5, 8:10)]), ]
 
 Discriminant analysis is a type of statistical analysis used to predict the probability of belonging to a given class or category based on one or more predictor variables. We will be covering two different types of discriminant analyses: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
 
-Linear discriminant analysis is used to find a linear combination of features that separates different classes in a data set. LDA works by calculating the means and covariance matrices for each data class, assuming a common covarience matrix between all classes. When effectively utilized, LDA finds the linear combination of variables that provide the best possible separation between the groups.
+Linear discriminant analysis is used to find a linear combination of features that separates different classes in a data set. LDA works by calculating the means and covariance matrices for each data class, assuming a common covariance matrix between all classes. When effectively utilized, LDA finds the linear combination of variables that provide the best possible separation between the groups.
 
 Quadratic discriminant analysis is similar to LDA, but assumes that that each class has its own unique covariance matrix. QDA can be thought of as an extension to LDA, as it is still classifying observations from a set of predictor variables. Since each class has its own, unique covariance matrix, QDA allows for complex, non-linear modeling.
 
@@ -104,21 +68,21 @@ Quadratic discriminant analysis is similar to LDA, but assumes that that each cl
 
 -   LDAs operate by projecting a feature space (a data set of n dimensions) onto a smaller space "k", where k \<= n-1 without losing class information.
 
--   An LDA model comprises the statistical properties that are calculated for the data in each class - where there are multiple variables, these properties are calculated over the multivariate Gaussian (normal) distribution -the Gaussian distribution is a probability distribution that is symmetric about the mean, resulting in a "bell curve" shape multivariates are:
+-   An LDA model comprises the statistical properties that are calculated for the data in each class - where there are multiple variables, these properties are calculated over the multivariate Gaussian (normal) distribution -the Gaussian distribution is a probability distribution that is symmetric about the mean, resulting in a "bell curve" shape multi-variates are:
 
 #### Means
 
 -   Covariance matrix (measures how each variable or feature relates to others within the same class). The model assumes the following:
 
-1.  the input dataset has a normal distribution
+1.  the input data set has a normal distribution
 
-2.  the dataset is linearly separable, meaning LDA can draw a decision boundary that separates the data points
+2.  the data set is linearly separable, meaning LDA can draw a decision boundary that separates the data points
 
 3.  each class has the same covariance matrix
 
 -   These assumptions carry the limitation that LDA may not perform well in high-dimensional feature spaces
 
-#### Linear transformations are analyzed using eigenvectors and eigenvalues
+#### Linear transformations are analyzed using Eigenvectors and Eigenvalues
 
 -   Eigenvectors provide the "direction" within the scatterplot
 -   During dimensionality reduction, the eigenvectors are calculated from the data set and collected in two scatter-matrices:
@@ -131,7 +95,7 @@ Quadratic discriminant analysis is similar to LDA, but assumes that that each cl
 
 ### Getting Started
 
-Let's start by simulating some data. Linear Discriminant Analysis works best with normal, continuous variables with low colinearity. Considering this, let's imagine a study where a geneticist wants to classify a monkey into one of two classes based on the number of transcriptions of certain genes:
+Let's start by simulating some data. Linear Discriminant Analysis works best with normal, continuous variables with low colinearity. Considering this, let's imagine a study where a geneticist wants to classify a monkey into one of three classes based on the number of transcriptions of certain genes:
 
 ```{r}
 #| label: Simulating Data
@@ -171,7 +135,7 @@ lda_data <- data.frame(
 head(lda_data)
 ```
 
-### Challenge 1 - Linear Discriminant Analysis with 2 Variables
+### Challenge 1 - Linear Discriminant Analysis with 2 Classes
 
 Linear discriminant analysis reduces the number of dimensions by creating a new axis while simultaneously considering two criteria:
 
@@ -184,7 +148,7 @@ $$
 \frac{(\mu_1 - \mu_2)^2}{s^2_1 + s^2_2}
 $$
 
-For an example where we only consider two genes and classes, lets start by calculating the values we need. The means are easy, but we have to make sure to distinguish between class AND gene.
+For an example where we only consider two classes, lets start by calculating the values we need. The means are easy, but we have to make sure to distinguish between class AND gene.
 
 ```{r}
 #| label: Calculating Means
@@ -282,7 +246,6 @@ lda_data_xy$lda_proj <- as.vector(lda_proj)
 Now let's see this in context
 
 ```{r}
-
 proj_coords <- X_centered %*% w_unit %*% t(w_unit)
 
 global_mean <- colMeans(X)
