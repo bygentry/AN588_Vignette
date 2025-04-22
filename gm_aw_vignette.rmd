@@ -22,32 +22,6 @@ library(plot_ly)
 library(geometry)
 ```
 
-### Loading Data
-
-First things first, we'll load in the data that we need down the road and clean it up to get that out of the way.
-
-```{r}
-#| label: Loading Data
-
-library(curl)
-
-# store data from gibbon-femurs.csv in holder f
-f <- curl("https://raw.githubusercontent.com/bygentry/AN588_Vignette/refs/heads/main/KamilarAndCooperData.csv")
-
-# convert data in f to a data frame and store in holder d
-d <- read.csv(f, sep = ",", stringsAsFactors = TRUE)
-```
-
-### Cleaning Data
-
-```{r}
-#| label: Cleaning Data
-
-library(tidyverse)
-
-tidy.data <- d[complete.cases(d[ , c(5, 8:10)]), ]
-```
-
 ## Introduction
 
 ### What is Discriminant Analysis?
@@ -129,7 +103,7 @@ lda_data <- data.frame(
 head(lda_data)
 ```
 
-### Challenge 1 - Linear Discriminant Analysis with 2 Classes
+## Challenge 1 - Linear Discriminant Analysis with 2 Classes
 
 Linear discriminant analysis reduces the number of dimensions by creating a new axis while simultaneously considering two criteria:
 
@@ -284,7 +258,7 @@ ggplot() +
 
 And we can see that the boundary line that divides the group is perpendicular to the LDA axis that shows the direction of separation.
 
-### Challenge 2 - LDA with More than 2 Categories
+## Challenge 2 - LDA with More than 2 Categories
 
 So you might be wondering, if $d$ is the difference between the means, how do we use this formula with more than 2 categories? We can't just use the distance between any two.
 
@@ -386,9 +360,34 @@ fig <- plot_ly(data = lda_data,
          scene = list(xaxis = list(title = 'LD1'),
                       yaxis = list(title = 'LD2')))
 fig
+
 ```
 
-### Challenge 3 - Quadratic Discriminant Analysis
+## Challenge 3 - Quadratic Discriminant Analysis
+
+### Loading Data
+
+First things first, we'll load in the data that we need and clean it up to get that out of the way.
+
+```{r}
+#| label: Loading Data
+
+# store data from Kamilar and Cooper in holder f 
+f <- curl("https://raw.githubusercontent.com/bygentry/AN588_Vignette/refs/heads/main/KamilarAndCooperData.csv")  
+# convert data in f to a data frame and store in data.frame d 
+d <- read.csv(f, sep = ",", stringsAsFactors = TRUE)
+```
+
+### Cleaning Data
+
+```{r}
+#| label: Cleaning Data  
+
+# Using complete.cases() from the built-in stats package, we can remove rows with NA in specific columns  
+tidy.data <- d[complete.cases(d[ , c(5, 8:10)]), ]
+```
+
+### Implementing QDA
 
 First, we must set seed for reproducibility.
 
