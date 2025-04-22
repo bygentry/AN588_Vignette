@@ -246,20 +246,45 @@ $$
 ```{r}
 # For an example where we only consider two genes, lets start by calculating the values we need. The means are easy, 
 
-mu1 <- mean(gene_x)
-mu2 <- mean(gene_y)
+mu1 <- colMeans(lda_data[lda_data$class == "A", 1:2])
+mu2 <- colMeans(lda_data[lda_data$class == "B", 1:2])
 
 # but things get a little tricky when it comes to spread. 
-# Because LDA assumes that the data all share the same covariance matrix, we can't just use the standard deviations of the raw data.
+# Because LDA assumes that the data all share the same covariance matrix (a.k.a pooled covariance matrix),  we can't just use the standard deviations of the raw data.
 
-# This is computed internally by lda(), but you can compute it manually like this:
-cov_pooled <- cov(lda_data[lda_data$response == "A", 1:2]) * 
-              (sum(lda_data$response == "A") - 1) +
-              cov(lda_data[lda_data$response == "B", 1:2]) * 
-              (sum(lda_data$response == "B") - 1)
+# The covariance matrix is computed internally by lda(), but you can compute it manually like this:
+S1 <- cov(lda_data[lda_data$class == "A", 1:2])
+S2 <- cov(lda_data[lda_data$class == "B", 1:2])
+n1 <- sum(lda_data$class == "A")
+n2 <- sum(lda_data$class == "B")
+cov_pooled <- ((n1 - 1)*S1 + (n2 - 1)*S2) / (n1 + n2 - 2)
 
-cov_pooled <- cov_pooled / (nrow(lda_data) - 2)
 cov_pooled
+
+# To calculate the eigen values that serve as coefficients for the linear boundary, we have to use the inverse of the covariance matrix
+
+cov_inv <- solve(cov_pooled)
+
+w <- as.vector(cov_inv %*% (mu1 - mu2))
+b <- -0.5 * t(mu1 + mu2) %*% cov_inv %*% (mu1 - mu2)
+
+# Create a grid to visualize the boundary
+x_vals <- seq(min(lda_data$gene_x), max(lda_data$gene_x), length.out = 100)
+y_vals <- (-w[1] * x_vals - b) / w[2]  # Solving for y
+boundary <- data.frame(gene_x = x_vals, gene_y = as.vector(y_vals)
+)
+```
+
+```{r}
+# Plot data and boundary
+ggplot(lda_data, aes(x = gene_x, y = gene_y, color = class)) +
+  geom_point()  +
+  geom_line(data = boundary, aes(x = x_vals, y = y_vals), color = "black", linetype = "dashed") +
+  labs(title = "LDA Boundary for gene_x vs gene_y") + 
+  theme_bw() 
+```
+
+```{r}
 
 ```
 
