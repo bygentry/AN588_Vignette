@@ -12,20 +12,14 @@ editor: visual
 ```{r}
 #| label: Installing Packages
 
-repos = "http://cran.us.r-project.org"
-
-if(!require("tidyverse")){ install.packages("tidyverse", repos = repos) } 
-if(!require("MASS")){ install.packages("MASS", repos = repos) }
-if(!require("ggplot2")){ install.packages("ggplot2", repos = repos) }
-if(!require("klaR")){ install.packages("klar", repos = repos) }
-if(!require("curl")){ install.packages("curl", repos = repos) }
-if(!require("psych")){ install.packages("psych", repos = repos) }
-if(!require("plot_ly")){ install.packages("plot_ly", repos = repos) }
-if(!require("geometry")){ install.packages("geometry", repos = repos) }
-
 library(klaR)
 library(curl)
 library(psych)
+library(tidyverse)
+library(MASS)
+library(ggplot2)
+library(plot_ly)
+library(geometry)
 ```
 
 ### Loading Data
