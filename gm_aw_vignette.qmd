@@ -5,13 +5,9 @@ format: html
 editor: visual
 ---
 
-## working notes - will be deleted 
+## working notes - will be deleted
 
--   see equation 20.2 in book of R
-
--   linear regression: predicting value of response var y based on observed relationship with predictor variable x. used to construct linear models of a relationship between x and y
-
--   residual: difference of actual and predicted values in response variable
+-   module7
 
 -   bootstrap data to make predictions while representing all genus levels in training set for LDA? normal? outliers?
 
@@ -47,6 +43,8 @@ editor: visual
 
 ## Preliminaries
 
+### Packages
+
 ```{r}
 #| label: Loading Packages
 
@@ -67,6 +65,8 @@ library(curl)
 library(psych)
 ```
 
+### Loading Data
+
 ```{r}
 #| label: Loading Data
 
@@ -77,9 +77,52 @@ f <- curl("https://raw.githubusercontent.com/bygentry/AN588_Vignette/refs/heads/
 d <- read.csv(f, sep = ",", stringsAsFactors = TRUE)
 ```
 
+### Cleaning Data
+
+First, let's create a new `data.frame` to hold our clean data. Then, we can clean it up.
+
+```{r}
+#| label: Cleaning Data I  
+
+# creates a new data.frame "tidy.data" as a copy of "d" 
+tidy.data <- d  
+# using the str() command we can see that Brain_Size_Species_Mean has at least one NA value 
+str(tidy.data[5]) 
+tidy.data[2, 5]
+```
+
+We can check the other columns in the same way and see that all of them contain `NA` values somewhere. Luckily, the base R package `{stats}` comes with some functions that makes removing these easy - we'll be using `complete.cases()`:
+
+```{r}
+#| label: Cleaning Data II  
+tidy.data <- tidy.data[complete.cases(tidy.data[, c(5, 8:10)]),] 
+str(tidy.data)
+```
+
+Looks like 42 rows among those columns had `NA` values. Let's verify that we're `NA` free now.
+
+```{r}
+#| label: Cleaning Data III  
+# iterates over each row in tidy.data columns 5, 8, 9, and 10 and if an NA is found, prints the index of that NA 
+for(i in 1:nrow(tidy.data)){
+  for(j in c(5, 8, 9, 10)){
+    if(is.na(tidy.data[i, j])){
+      print(paste0("NA at ", i,", ", j))
+      }
+    }
+  }
+```
+
+Cool, we're `NA` free. Thankfully, there is a much more succinct way to do this from the start:
+
+```{r}
+#| label: Cleaning Data IV  
+tidy.data <- d[complete.cases(d[ , c(5, 8:10)]), ]
+```
+
 ## Introduction
 
-### What is Discriminant Analysis? 
+### What is Discriminant Analysis?
 
 Discriminant analysis is a type of statistical analysis used to predict the probability of belonging to a given class or category based on one or more predictor variables. We will be covering two different types of discriminant analyses: linear discriminant analysis (LDA) and quadratic discriminant analysis (QDA).
 
@@ -118,114 +161,106 @@ Quadratic discriminant analysis is similar to LDA, but assumes that that each cl
 
 ### Getting Started
 
-Let's start by simulating some data. Linear Discriminant Analysis
+Let's start by simulating some data. Linear Discriminant Analysis works best with normal, continuous variables with low colinearity. Considering this, let's imagine a study where a geneticist wants to classify a monkey into one of two classes based on the number of transcriptions of certain genes:
 
 ```{r}
-str(d)
+#| label: Simulating Data
+
+# First, let's set a seed for reproducibility,
+set.seed(647)
+
+# then set n as the number of observations to simulate.
+n <- 1000
+
+# Now we can simulate the transcription frequencies.
+# Let's assume that the classification is set up as such:
+# Class A: higher expression of genes X and Z
+# Class B: higher expression of gene Y
+
+# for our purposes, let 0 = class B and 1 = class A
+monkey.class <- sample(c(0, 1), size = n, replace = TRUE)
+
+# now the gene expressions
+
+gene_x <- rnorm(n, mean = 5 - (2 * monkey.class), sd = 1) 
+# this will produce a distribution that is higher in class B individuals
+gene_y <- rnorm(n, mean = 5 + (2 * monkey.class), sd = 1)
+# this will produce a distribution that has higher class A frequency
+gene_z <- rnorm(n, mean = 5 - monkey.class, sd = 1)
+# this will produce a distribution that has slightly more class B individuals
+
+# Now, let's store this simulated data
+lda_data <- data.frame(
+  gene_x = gene_x,
+  gene_y = gene_y,
+  gene_z = gene_z,
+  class = factor(monkey.class, labels = c("B", "A"))
+)
+
+# and lastly, check the first few rows to make sure everything is right
+head(lda_data)
 ```
-
-So, we see that our data have 213 observations of 44 variables, but we're only going to use 4 of those variables in our analysis:
-
-```{r}
-colnames(d[ , c(5, 8:10)])
-```
-
-Using these four statistics, we can use LDA to make predictions about classifying these primates by species.
-
-#### Cleaning Our Data
-
-First, let's create a new `data.frame` to hold our clean data. Then, we can clean it up.
-
-```{r}
-#| label: Cleaning Our Data I
-
-# creates a new data.frame "tidy.data" as a copy of "d"
-tidy.data <- d
-
-# using the str() command we can see that Brain_Size_Species_Mean has at least one NA value
-str(tidy.data[5])
-tidy.data[2, 5]
-```
-
-We can check the other columns in the same way and see that all of them contain `NA` values somewhere. Luckily, the base R package `{stats}` comes with some functions that makes removing these easy - we'll be using `complete.cases()`:
-
-```{r}
-#| label: Cleaning Our Data II
-
-tidy.data <- tidy.data[complete.cases(tidy.data[ , c(5, 8:10)]), ]
-str(tidy.data)
-```
-
-Looks like 42 rows among those columns had `NA` values. Let's verify that we're `NA` free now.
-
-```{r}
-#| label: Cleaning Our Data III
-
-# iterates over each row in tidy.data columns 5, 8, 9, and 10 and if an NA is found, prints the index of that NA
-for(i in 1:nrow(tidy.data)){
-  for(j in c(5, 8, 9, 10))
-    if(is.na(tidy.data[i, j])){
-      print(paste0("NA at ", i,", ", j))
-  }
-}
-```
-
-Cool, we're `NA` free. Thankfully, there is a much more succinct way to do this from the start:
-
-```{r}
-#| label: Cleaning Our Data IV
-
-tidy.data <- d[complete.cases(d[ , c(5, 8:10)]), ]
-```
-
-#### Exploring Our Data
-
-Let's see how our variables relate to each other. Using `pairs.panels()` , we can produce a plot that shows us a scatter diagram of each variable in relation to each other, a histogram showing the distribution of values for each variable, and the associated correlation value for each scatter plot.
-
-```{r}
-#| label: Exploring Our Data I
-
-pairs.panels(tidy.data[, c(5, 8:10)],
-             gap = 1,
-             bg = (colorRampPalette(c("blue", "red"))(161)[tidy.data$Genus]),
-             pch = 21,
-             hist.col = "lightpink",
-             hist.border = "white")
-```
-
-This can be intimidating at first sight, but it's not as crazy as it might seem. Here it is again with the associated scatter plots and correlation values paired.
-
-![](https://github.com/bygentry/AN588_Vignette/blob/main/Images/plot_matrix.png)
-
-Based on these plots, it looks like brain size is strongly correlated with both male (1, r = 0.90) and female (2, r = 0.92) body mass, and male and female body mass are themselves strongly correlated (4, r = 0.97). The mass dimorphism ratio of each species doesn't seem to have a strong correlation with any of the other variables (3, r = 0.58; 5, r = 0.51; 6, r = 0.43), which is expected becuase it's a ratio between variables.
 
 #### Data Partitioning
 
-In order to predict the species of a primate based on these variables, we'll need to create a training data set through random sampling. Linear Discriminant Analysis requires at least one data point for each class in the training set, so let's bootstrap
+In order to predict the monkey's class, we'll need to create a training data set through random sampling.
 
-We'll use 66% of the set for training and the other 34% for testing:
+> Note: Linear discriminant analysis requires at least one data point for each class in the training set, so if there are any classes not represented, this will fail.
+
+We'll use 66% of the set for training and the other 34% for testing
 
 ```{r}
-#| label: Data Partitioning I
-
-set.seed(482)
-
-ind <- sample(2, nrow(tidy.data), 
+ind <- sample(2, nrow(lda_data), 
               replace = TRUE,
               prob = c(0.66, 0.34))
 
-training <- tidy.data[ind == 1, ]
-testing <- tidy.data[ind == 2, ]
-
-linear <- lda(Genus~., data = training)
-linear
+training <- lda_data[ind == 1, ]
+testing <- lda_data[ind == 2, ]
 ```
 
-### Linear Discriminant Analysis
+### Challenge 1 - Linear Discriminant Analysis with 2 Variables
+
+-   rework: challenge 1 -\> use simulated data to manually create a new axis (reduce dimensionality) with 2 variables
+
+    -   $\frac{(\mu_1 - \mu_2)^2}{s_1^2 + s_2^2}$
+
+    -   $d = \mu_1 - \mu_2$
+
+    -   $\frac{d^2}{s_1^2 + s_2^2}$
+
+    -   d = "distance" between means
+
+    -   by minimizing variation ("scatter", $s^2$) within each category, the denominator is reduced creating a larger ratio of distance over scatter
+
+Linear discriminant analysis reduces the number of dimensions by creating a new axis while simultaneously considering two criteria:
+
+1.  On the new axis, we want to **maximize** the distance between the means of each variable
+2.  On the new axis, we want to **minimize** the spread ( $s^2$ )in each class
+
+We can accomplish this by expressing the rate:
+
+$$
+\frac{(\mu_1 - \mu_2)^2}{s^2_1 + s^2_2}
+$$
 
 ```{r}
-linear <- lda(Genus~., data = training)
-linear
+# For an example where we only consider two genes, lets start by calculating the values we need. The means are easy, 
+
+mu1 <- mean(gene_x)
+mu2 <- mean(gene_y)
+
+# but things get a little tricky when it comes to spread. 
+# Because LDA assumes that the data all share the same covariance matrix, we can't just use the standard deviations of the raw data.
+
+# This is computed internally by lda(), but you can compute it manually like this:
+cov_pooled <- cov(lda_data[lda_data$response == "A", 1:2]) * 
+              (sum(lda_data$response == "A") - 1) +
+              cov(lda_data[lda_data$response == "B", 1:2]) * 
+              (sum(lda_data$response == "B") - 1)
+
+cov_pooled <- cov_pooled / (nrow(lda_data) - 2)
+cov_pooled
+
 ```
 
 ## Quadratic Discriminant Analysis
@@ -268,11 +303,11 @@ head(qda_predclass)
 
 Create a confusion matrix and a print confusion matrix.
 
-A confusion matrix evaluates the performance of classification models. It provides a detailed breakdown of possible prediction outcomes. A 
+A confusion matrix evaluates the performance of classification models. It provides a detailed breakdown of possible prediction outcomes. A
 
-confusion matrix can be made as a table, to compare the positives and negatives of the outcomes. 
+confusion matrix can be made as a table, to compare the positives and negatives of the outcomes.
 
-A print confusion matrix refers to the act of generating the confusion matrix table. 
+A print confusion matrix refers to the act of generating the confusion matrix table.
 
 ```{r}
 conf_matrix <- table(Predicted = qda_pred$class, Actual = test_data$Species)print(conf_matrix)
