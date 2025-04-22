@@ -268,6 +268,12 @@ head(qda_predclass)
 
 Create a confusion matrix and a print confusion matrix.
 
+A confusion matrix evaluates the performance of classification models. It provides a detailed breakdown of possible prediction outcomes. A 
+
+confusion matrix can be made as a table, to compare the positives and negatives of the outcomes. 
+
+A print confusion matrix refers to the act of generating the confusion matrix table. 
+
 ```{r}
 conf_matrix <- table(Predicted = qda_pred$class, Actual = test_data$Species)print(conf_matrix)
 ```
