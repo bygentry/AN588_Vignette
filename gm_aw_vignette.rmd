@@ -1,7 +1,14 @@
 ---
 title: "Linear and Quadratic Discriminant Analysis"
 author: "Gentry Miller and Alexandra Walsh"
-format: html
+output:
+  html_document:
+    theme: readable
+    df_print: kable
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    code_folding: show
 editor: visual
 ---
 
