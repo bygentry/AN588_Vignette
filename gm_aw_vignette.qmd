@@ -11,6 +11,7 @@ editor: visual
 
 ```{r}
 #| label: Packages
+#| message: false
 
 # data handling
 library(curl)
@@ -24,6 +25,7 @@ library(ggplot2)
 library(plotly)
 library(geometry)
 library(mulgar)
+library(ggpubr)
 ```
 
 ## Introduction
@@ -163,7 +165,7 @@ Division doesn't work well with matrices, so to calculate the eigenvalues that s
 cov_inv <- solve(cov_pooled)
 ```
 
-and use matrix multiplication, $\%*\%$, to multiply the inverse matrix, $W^{-1}$, by the difference between the two means, a.k.a. the distance between the classes. This is effectively an expression of $$ 
+and use matrix multiplication, `%*%`, to multiply the inverse matrix, $W^{-1}$, by the difference between the two means, a.k.a. the distance between the classes. This is effectively an expression of $$ 
 \frac{d^2}{s^2_1 + s^2_2}
 $$
 
@@ -185,6 +187,8 @@ Let's plot this boundary and see where the best place to split the classes is
 
 ```{r}
 #| label: Visualizing Linear Boundary
+#| warning: false
+#| code-fold: true
 
 # Filter out geno C data
 lda_data_xy <- lda_data[lda_data$geno != "C", ]
@@ -236,6 +240,7 @@ Now let's see this in context
 
 ```{r}
 #| label: Visualizing the Discriminant Axis
+#| code-fold: true
 
 proj_coords <- X_centered %*% w_unit %*% t(w_unit)
 
@@ -250,7 +255,7 @@ proj_df <- data.frame(
 )
 
 # Add the projected points to the plot
-p1 <- ggplot() +
+ggplot() +
   geom_point(data = lda_data_xy, aes(x = gene_x, y = gene_y, color = geno), alpha = 0.6, size = 2) +
   geom_point(data = proj_df, aes(x = gene_x_proj, y = gene_y_proj, color = geno), shape = 4, size = 2.5) +
   geom_segment(aes(x = lda_data_xy$gene_x, y = lda_data_xy$gene_y,
@@ -266,6 +271,7 @@ And finally, let's see both the boundary and discriminant axis together
 
 ```{r}
 #| label: Visualizing Boundary and Discriminant Together
+#| code-fold: true
 
 ggplot() +
   geom_point(data = lda_data_xy, aes(x = gene_x, y = gene_y, color = geno), alpha = 0.6, size = 2) +
@@ -343,6 +349,7 @@ Now, let's visualize this
 
 ```{r}
 #| label: Visualizing Multi-Class LDA
+#| code-fold: true
 
 # Create a grid of points to evaluate the decision boundary
 grid <- expand.grid(LD1 = seq(min(lda_data$LD1) - 1, max(lda_data$LD1) + 1, length.out = 100),
@@ -367,9 +374,10 @@ ggplot(lda_data, aes(x = LD1, y = LD2, color = geno)) +
   theme(aspect.ratio = 1, legend.title = element_blank())
 ```
 
-Here, the line is squiggly because it represents a planar version of the LDA boundary. It might be easier to see here:
+Here, the line is squiggly because it represents a planar version of the LDA boundary. It might be easier to see by restructuring the plot - one common method for this in LDA is through ellipses:
 
 ```{r}
+#| label: Generating Class Ellipses
 ell <- NULL
 for(i in unique(lda_data$geno)){
   x <- lda_data |> dplyr::filter(geno == i)
@@ -380,6 +388,8 @@ for(i in unique(lda_data$geno)){
 ```
 
 ```{r}
+#| label: Plotting Ellipses
+#| code-fold: true
 lda1 <- ggplot(lda_data,
                aes(x = gene_x, y = gene_y, color = geno)) +
   geom_point() + 
@@ -401,7 +411,7 @@ ggarrange(lda1, lda2, ncol = 2, common.legend = TRUE, legend = "bottom")
 
 ```{r}
 #| label: 3D Modeling of Multi-Class LDA
-
+#| code-fold: true
 # Create a 3D scatter plot with LD1, LD2, and LD3
 fig <- plot_ly(data = ell, 
                 x = ~gene_x, 
