@@ -198,7 +198,7 @@ ggplot(lda_data_xy, aes(x = gene_x, y = gene_y, color = geno)) +
   theme_bw() 
 ```
 
-Now let's project these onto a lower dimension. First, we should make sure our LDA vector is normalized
+Now let's project these onto a lower dimension. First, we should make sure our LDA vector is normalized, a.k.a made to be a unit vector
 
 ```{r}
 #| label: Normalizing Eigenvector
@@ -206,7 +206,7 @@ Now let's project these onto a lower dimension. First, we should make sure our L
 w_unit <- w/sqrt(sum(w^2))
 ```
 
-Now, center the data about the mean
+Now, center the data about the means
 
 ```{r}
 #| label: Centering Classes
