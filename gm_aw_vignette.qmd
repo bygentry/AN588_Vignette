@@ -570,7 +570,7 @@ qda_model <- qda(Species ~ ., data = train_data)
 
 If the above line of code is not working, trouble shoot it with the following code:
 
-train_data <- na.omit(train_data)
+train_data \<- na.omit(train_data)
 
 This will remove all rows from the data frame or matrix that may contain missing values.
 
